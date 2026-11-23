@@ -1,0 +1,35 @@
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: supporthub-backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://supporthub-db:5432/supporthub
+      SPRING_DATASOURCE_USERNAME: supporthub_user
+      DB_PASSWORD: ${DB_PASSWORD:?Database password is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT secret is required}
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Kolkata
+    ports:
+      - "8081:8081"
+    networks:
+      - supporthub-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: supporthub-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - supporthub-network
+
+networks:
+  supporthub-network:
+    external: true
